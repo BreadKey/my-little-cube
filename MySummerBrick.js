@@ -10,6 +10,9 @@ class Brick {
 }
 
 var gl;
+var lightVector = {
+    x: 1, y: 1, z: 1
+};
 
 var bricks = [];
 var selectedIndex = 0;
@@ -130,7 +133,8 @@ function initialiseShaders() {
             uniform mediump mat4 Pmatrix; \
 			uniform mediump mat4 Vmatrix; \
 			uniform mediump mat4 Mmatrix; \
-			uniform mediump mat4 Nmatrix; \
+            uniform mediump mat4 Nmatrix; \
+            uniform mediump vec3 lightVector; \
 			varying mediump vec4 color; \
 			varying mediump vec2 texCoord;\
 			void main(void)  \
@@ -146,8 +150,8 @@ function initialiseShaders() {
 				v5 = normalize(v3.xyz); \
 				gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(myVertex, 1.0); \
 				nN = Nmatrix * vec4(myNormal, 1.0); \
-				color = brickColor * 0.5 * (dot(v5, vec3(0, 0, 1)) + 1.0); \
-				color.a = 1.0; \
+				color = brickColor * 0.5 * (dot(v5, lightVector) + 1.0); \
+				color.a = brickColor.a; \
 				texCoord = myUV; \
 			}';
 
@@ -193,7 +197,7 @@ function get_projection(angle, a, zMin, zMax) {
         0, 0, (-2 * zMax * zMin) / (zMax - zMin), 0];
 }
 
-var proj_matrix = get_projection(30, 1.0, 1, 8.0);
+var proj_matrix = get_projection(30, 1.0, 1, 15.0);
 var mov_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 var view_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 // translating z
@@ -355,12 +359,14 @@ function renderScene(time) {
     var Mmatrix = gl.getUniformLocation(gl.programObject, "Mmatrix");
     var Nmatrix = gl.getUniformLocation(gl.programObject, "Nmatrix");
     var color_location = gl.getUniformLocation(gl.programObject, "brickColor");
+    var lightVector_location = gl.getUniformLocation(gl.programObject, "lightVector");
 
     idMatrix(mov_matrix);
     
     gl.uniformMatrix4fv(Pmatrix, false, proj_matrix);
     gl.uniformMatrix4fv(Vmatrix, false, view_matrix);
- 
+    gl.uniform3fv(lightVector_location, [lightVector.x, lightVector.y, lightVector.z])
+
     if (!testGLError("gl.uniformMatrix4fv")) {
         return false;
     }
@@ -452,12 +458,17 @@ var mouseMove = function (e) {
     if (!drag) return false;
     dX = (e.pageX - old_x) * 2 * Math.PI / canvas.width,
     dY = (e.pageY - old_y) * 2 * Math.PI / canvas.height;
+    var brick = bricks[selectedIndex];
     if (is_holding_left_shift) {
-        bricks[selectedIndex].transform.position.y += -dY;
-        bricks[selectedIndex].transform.position.x += dX;
+        brick.transform.position.y += -dY;
+        brick.transform.position.x += dX;
+        document.getElementById("position_x").value = brick.transform.position.x;
+        document.getElementById("position_y").value = brick.transform.position.y;
     } else {
-        bricks[selectedIndex].transform.rotation.y += dX;
-        bricks[selectedIndex].transform.rotation.x += dY;
+        brick.transform.rotation.y += dX;
+        brick.transform.rotation.x += dY;
+        document.getElementById("rotation_x").value = brick.transform.rotation.x;
+        document.getElementById("rotation_y").value = brick.transform.rotation.y;
     };
     old_x = e.pageX, old_y = e.pageY;
     e.preventDefault();
@@ -478,7 +489,11 @@ function main() {
     canvas.addEventListener("mouseout", mouseUp, false);
     canvas.addEventListener("mousemove", mouseMove, false);
     canvas.addEventListener("mousewheel", mouseWheel, false);
-    addBrick()
+    addBrick();
+    setOnInput();
+    document.getElementById("light_x").value = lightVector.x;
+    document.getElementById("light_y").value = lightVector.y;
+    document.getElementById("light_z").value = lightVector.z;
     console.log("Start");
 
     if (!initialiseGL(canvas)) {
@@ -519,9 +534,105 @@ function addBrick() {
 
     var brickButton = document.createElement("button");
     brickButton.innerHTML = "Brick" + bricks.length;
+    selectBrick(brick);
     brickButton.onclick = function() {
-        selectedIndex = bricks.indexOf(brick);
+        selectBrick(brick);
     }
     
     brickButtonList.appendChild(brickButton);
+}
+
+function selectBrick(brick) {
+    selectedIndex = bricks.indexOf(brick);
+    updateBrickInformation(brick)
+}
+
+function updateBrickInformation(brick) {
+    document.getElementById("scale_x").value = brick.transform.scale.x;
+    document.getElementById("scale_y").value = brick.transform.scale.y;
+    document.getElementById("scale_z").value = brick.transform.scale.z;
+    
+    document.getElementById("position_x").value = brick.transform.position.x;
+    document.getElementById("position_y").value = brick.transform.position.y;
+    document.getElementById("position_z").value = brick.transform.position.z;
+    
+    document.getElementById("rotation_x").value = brick.transform.rotation.x;
+    document.getElementById("rotation_y").value = brick.transform.rotation.y;
+    document.getElementById("rotation_z").value = brick.transform.rotation.z;
+    
+    document.getElementById("color_r").value = brick.color.r;
+    document.getElementById("color_g").value = brick.color.g;
+    document.getElementById("color_b").value = brick.color.b;
+    document.getElementById("color_a").value = brick.color.a;
+}
+
+function setOnInput() {
+    var scale_x = document.getElementById("scale_x");
+    scale_x.oninput = function() {
+        bricks[selectedIndex].transform.scale.x = scale_x.value;
+    };
+    var scale_y = document.getElementById("scale_y");
+    scale_y.oninput = function() {
+        bricks[selectedIndex].transform.scale.y = scale_y.value;
+    };
+    var scale_z = document.getElementById("scale_z");
+    scale_z.oninput = function() {
+        bricks[selectedIndex].transform.scale.z = scale_z.value;
+    };
+
+    var position_x = document.getElementById("position_x");
+    position_x.oninput = function() {
+        bricks[selectedIndex].transform.position.x = position_x.value;
+    };
+    var position_y = document.getElementById("position_y");
+    position_y.oninput = function() {
+        bricks[selectedIndex].transform.position.y = position_y.value;
+    };
+    var position_z = document.getElementById("position_z");
+    position_z.oninput = function() {
+        bricks[selectedIndex].transform.position.z = position_z.value;
+    };
+
+    var rotation_x = document.getElementById("rotation_x");
+    rotation_x.oninput = function() {
+        bricks[selectedIndex].transform.rotation.x = rotation_x.value;
+    };
+    var rotation_y = document.getElementById("rotation_y");
+    rotation_y.oninput = function() {
+        bricks[selectedIndex].transform.rotation.y = rotation_y.value;
+    };
+    var rotation_z = document.getElementById("rotation_z");
+    rotation_z.oninput = function() {
+        bricks[selectedIndex].transform.rotation.z = rotation_z.value;
+    };
+
+    var color_r = document.getElementById("color_r");
+    color_r.oninput = function() {
+        bricks[selectedIndex].color.r = color_r.value;
+    };
+    var color_g = document.getElementById("color_g");
+    color_g.oninput = function() {
+        bricks[selectedIndex].color.g = color_g.value;
+    };
+    var color_b = document.getElementById("color_b");
+    color_b.oninput = function() {
+        bricks[selectedIndex].color.b = color_b.value;
+    };
+    var color_a = document.getElementById("color_a");
+    color_a.oninput = function() {
+        bricks[selectedIndex].color.a = color_a.value;
+    };
+
+    var light_x = document.getElementById("light_x");
+    light_x.oninput = function() {
+        lightVector.x = light_x.value;
+    }
+    var light_y = document.getElementById("light_y");
+    light_y.oninput = function() {
+        lightVector.y = light_y.value;
+    }
+    var light_z = document.getElementById("light_z");
+    light_z.oninput = function() {
+        lightVector.z = light_z.value;
+    }
 }
