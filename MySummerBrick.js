@@ -1,3 +1,5 @@
+// (CC-NC-BY) 이영기 2019
+
 class Brick {
     constructor() {
         this.color = { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };
@@ -151,7 +153,7 @@ function initialiseShaders() {
 				v3 = v2 - v1; \
 				v5 = normalize(v3.xyz); \
 				gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(myVertex, 1.0); \
-				nN = Nmatrix * vec4(myNormal, 1.0); \
+                nN = Nmatrix * vec4(myNormal, 1.0); \
 				color = brickColor * 0.5 * (dot(v5, lightVector) + 1.0); \
 				color.a = brickColor.a; \
 				texCoord = myUV; \
@@ -199,7 +201,7 @@ function get_projection(angle, a, zMin, zMax) {
         0, 0, (-2 * zMax * zMin) / (zMax - zMin), 0];
 }
 
-var proj_matrix = get_projection(30, 1.0, 1, 15.0);
+var proj_matrix = get_projection(30, 1.0, 1, 15);
 var view_matrix = create$3();
 // translating z
 view_matrix[14] = view_matrix[14] - 4;//zoom
@@ -461,74 +463,8 @@ function scale$3(out, a, v) {
     return out;
 }
 
-function normalizeVec3(v) {
-    sq = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
-    sq = Math.sqrt(sq);
-    if (sq < 0.000001) // Too Small
-        return -1;
-    v[0] /= sq; v[1] /= sq; v[2] /= sq;
-}
-
-function rotateArbAxis(m, angle, axis) {
-    var axis_rot = [0, 0, 0];
-    var ux, uy, uz;
-    var rm = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-    var c = Math.cos(angle);
-    var c1 = 1.0 - c;
-    var s = Math.sin(angle);
-    axis_rot[0] = axis[0];
-    axis_rot[1] = axis[1];
-    axis_rot[2] = axis[2];
-    if (normalizeVec3(axis_rot) == -1)
-        return -1;
-    ux = axis_rot[0]; uy = axis_rot[1]; uz = axis_rot[2];
-    console.log("Log", angle);
-    rm[0] = c + ux * ux * c1;
-    rm[1] = uy * ux * c1 + uz * s;
-    rm[2] = uz * ux * c1 - uy * s;
-    rm[3] = 0;
-
-    rm[4] = ux * uy * c1 - uz * s;
-    rm[5] = c + uy * uy * c1;
-    rm[6] = uz * uy * c1 + ux * s;
-    rm[7] = 0;
-
-    rm[8] = ux * uz * c1 + uy * s;
-    rm[9] = uy * uz * c1 - ux * s;
-    rm[10] = c + uz * uz * c1;
-    rm[11] = 0;
-
-    rm[12] = 0;
-    rm[13] = 0;
-    rm[14] = 0;
-    rm[15] = 1;
-
-    multiply$3(m, m, rm);
-}
-
-rotValue = 0.0;
-rotValueSmall = 0.0;
-incRotValue = 0.0;
-incRotValueSmall = 0.02;
-
-transX = 0.0;
-frames = 1;
-tempRotValue = 0.0;
-function stopRotate() {
-    if (incRotValue == 0.0) {
-        incRotValue = tempRotValue;
-    }
-    else {
-        tempRotValue = incRotValue;
-        incRotValue = 0.0;
-    }
-}
-
 var time_old = 0;
 function renderScene(time) {
-    //console.log("Frame "+frames+"\n");
-    frames += 1;
-
     var Pmatrix = gl.getUniformLocation(gl.programObject, "Pmatrix");
     var Vmatrix = gl.getUniformLocation(gl.programObject, "Vmatrix");
     var Mmatrix = gl.getUniformLocation(gl.programObject, "Mmatrix");
@@ -570,13 +506,6 @@ function renderScene(time) {
         var brick = bricks[i]
 
         var brick_mov_matrix = create$3();
-        scale$3(brick_mov_matrix, brick_mov_matrix,
-            [
-                brick.transform.scale.x,
-                brick.transform.scale.y,
-                brick.transform.scale.z
-            ]
-        );
 
         translate$2(brick_mov_matrix, brick_mov_matrix,
             [
@@ -589,6 +518,14 @@ function renderScene(time) {
         rotateX(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.x);
         rotateZ(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.z);
 
+        scale$3(brick_mov_matrix, brick_mov_matrix,
+            [
+                brick.transform.scale.x,
+                brick.transform.scale.y,
+                brick.transform.scale.z
+            ]
+        );
+        
         time_old = time;
 
         gl.uniformMatrix4fv(Mmatrix, false, brick_mov_matrix);
