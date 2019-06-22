@@ -463,6 +463,11 @@ var mouseMove = function (e) {
     e.preventDefault();
 };
 
+function mouseWheel(e) {
+    var delta = e.wheelDelta / 250;
+    view_matrix[14] += delta;
+}
+
 function main() {
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
@@ -472,6 +477,7 @@ function main() {
     canvas.addEventListener("mouseup", mouseUp, false);
     canvas.addEventListener("mouseout", mouseUp, false);
     canvas.addEventListener("mousemove", mouseMove, false);
+    canvas.addEventListener("mousewheel", mouseWheel, false);
     addBrick()
     console.log("Start");
 
