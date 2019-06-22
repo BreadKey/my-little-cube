@@ -21,6 +21,9 @@ var lightVector = {
 var cubes = [];
 var selectedIndex = 0;
 
+const AXES = ['x', 'y', 'z'];
+const RGBA = ['r', 'g', 'b', 'a'];
+
 function testGLError(functionLastCalled) {
 
     var lastError = gl.getError();
@@ -678,31 +681,23 @@ function addCube() {
 
 function selectCube(cube) {
     selectedIndex = cubes.indexOf(cube);
-    updatecubeInformation(cube)
+    updateCubeInformation(cube)
 }
 
-function updatecubeInformation(cube) {
-    document.getElementById("scale_x").value = cube.transform.scale.x;
-    document.getElementById("scale_y").value = cube.transform.scale.y;
-    document.getElementById("scale_z").value = cube.transform.scale.z;
+function updateCubeInformation(cube) {
+    AXES.forEach(function(axis, index) {
+        document.getElementById("scale_" + axis).value = cube.transform.scale[axis];
+        document.getElementById("position_" + axis).value = cube.transform.position[axis];
+        document.getElementById("rotation_" + axis).value = cube.transform.rotation[axis];
+    });
 
-    document.getElementById("position_x").value = cube.transform.position.x;
-    document.getElementById("position_y").value = cube.transform.position.y;
-    document.getElementById("position_z").value = cube.transform.position.z;
-
-    document.getElementById("rotation_x").value = cube.transform.rotation.x;
-    document.getElementById("rotation_y").value = cube.transform.rotation.y;
-    document.getElementById("rotation_z").value = cube.transform.rotation.z;
-
-    document.getElementById("color_r").value = cube.color.r;
-    document.getElementById("color_g").value = cube.color.g;
-    document.getElementById("color_b").value = cube.color.b;
-    document.getElementById("color_a").value = cube.color.a;
+    RGBA.forEach(function(element, index) {
+        document.getElementById("color_" + element).value = cube.color[element];
+    });
 }
 
 function setOnInput() {
-    var axes = ['x', 'y', 'z']
-    axes.forEach(function(axis, index) {
+    AXES.forEach(function(axis, index) {
         var scale = document.getElementById("scale_" + axis);
         scale.oninput = function() {
             cubes[selectedIndex].transform.scale[axis] = scale.value;
@@ -724,8 +719,7 @@ function setOnInput() {
         }
     });
 
-    var rgba = ['r', 'g', 'b', 'a']
-    rgba.forEach(function(element, index) {
+    RGBA.forEach(function(element, index) {
         var color = document.getElementById('color_' + element);
         color.oninput = function() {
             cubes[selectedIndex].color[element] = color.value;
