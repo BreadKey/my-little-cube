@@ -545,18 +545,32 @@ var drag = false;
 var old_x, old_y;
 var dX = 0, dY = 0;
 var is_holding_left_shift = false;
+const COLOR_KEYS = {
+    r: 82, g: 71, b: 66, a: 65
+};
+var pressed_color_key = null;
 
 var keyDown = function (e) {
     if (e.keyCode == 16) {
         is_holding_left_shift = true;
+    } else {
+        pressed_color_key = getKeyByValue(COLOR_KEYS, e.keyCode);
     }
 };
 
 var keyUp = function (e) {
     if (e.keyCode == 16) {
         is_holding_left_shift = false;
+    } else {
+        if (getKeyByValue(COLOR_KEYS, e.keyCode) != undefined) {
+            pressed_color_key = null;
+        }
     }
 };
+
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
 
 var mouseDown = function (e) {
     drag = true;
@@ -590,8 +604,13 @@ var mouseMove = function (e) {
 };
 
 function mouseWheel(e) {
-    var delta = e.wheelDelta / 250;
-    view_matrix[14] += delta;
+    var delta = e.wheelDelta > 0 ? 0.1 : -0.1;
+    cube = cubes[selectedIndex];
+    if (pressed_color_key != null) {
+        cube.color[pressed_color_key] += delta;
+        document.getElementById('color_' + pressed_color_key).value = cube.color[pressed_color_key];
+    } else
+        view_matrix[14] += delta;
 }
 
 function main() {
