@@ -1,13 +1,15 @@
 class Brick {
     constructor() {
-        this.color = {r: 1.0, g: 0.0, b: 0.0, a: 1.0};
+        this.color = { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };
         this.transform = {
-            scale: {x: 1.0, y: 1.0, z: 1.0},
-            position: {x: 0.0, y: 0.0, z: 0.0},
-            rotation: {x: 0.0, y: 0.0, z: 0.0}
+            scale: { x: 1.0, y: 1.0, z: 1.0 },
+            position: { x: 0.0, y: 0.0, z: 0.0 },
+            rotation: { x: 0.0, y: 0.0, z: 0.0 }
         }
     }
 }
+
+var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
 
 var gl;
 var lightVector = {
@@ -51,53 +53,53 @@ var shaderProgram;
 function initialiseBuffer() {
 
     var vertexData = [
-        -0.5, 0.5, 0.5,  0.0, 1.0, 0.0, 1.0, 0.0, //3
-        0.5, 0.5, 0.5,  1.0, 1.0, 0.0, 1.0, 0.0, //1
-        0.5, 0.5, -0.5,  1.0, 1.0, 0.0, 1.0, 0.0, //2
+        -0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 1.0, 0.0, //3
+        0.5, 0.5, 0.5, 1.0, 1.0, 0.0, 1.0, 0.0, //1
+        0.5, 0.5, -0.5, 1.0, 1.0, 0.0, 1.0, 0.0, //2
 
-        -0.5, 0.5, 0.5,  0.0, 1.0, 0.0, 1.0, 0.0, //3
-        0.5, 0.5, -0.5,  1.0, 1.0, 0.0, 1.0, 0.0, //2
-        -0.5, 0.5, -0.5,  0.0, 1.0, 0.0, 1.0, 0.0, //4
+        -0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 1.0, 0.0, //3
+        0.5, 0.5, -0.5, 1.0, 1.0, 0.0, 1.0, 0.0, //2
+        -0.5, 0.5, -0.5, 0.0, 1.0, 0.0, 1.0, 0.0, //4
 
-        0.5, 0.5, -0.5,  1.0, 1.0, 0.0, 0.0, -1.0, //2
-        0.5, -0.5, -0.5,  1.0, 0.0, 0.0, 0.0, -1.0, //6
-        -0.5, -0.5, -0.5,  0.0, 0.0, 0.0, 0.0, -1.0, //8
+        0.5, 0.5, -0.5, 1.0, 1.0, 0.0, 0.0, -1.0, //2
+        0.5, -0.5, -0.5, 1.0, 0.0, 0.0, 0.0, -1.0, //6
+        -0.5, -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, -1.0, //8
 
-        -0.5, 0.5, -0.5,  0.0, 1.0, 0.0, 0.0, -1.0, //4
-        0.5, 0.5, -0.5,  1.0, 1.0, 0.0, 0.0, -1.0, //2
-        -0.5, -0.5, -0.5,  0.0, 0.0, 0.0, 0.0, -1.0, //8
+        -0.5, 0.5, -0.5, 0.0, 1.0, 0.0, 0.0, -1.0, //4
+        0.5, 0.5, -0.5, 1.0, 1.0, 0.0, 0.0, -1.0, //2
+        -0.5, -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, -1.0, //8
 
-        0.5, -0.5, 0.5,  0.0, 1.0, 1.0, 0.0, 0.0, //5
-        0.5, -0.5, -0.5,  0.0, 1.0, 1.0, 0.0, 0.0, //6
-        0.5, 0.5, -0.5,  1.0, 1.0, 1.0, 0.0, 0.0, //2
+        0.5, -0.5, 0.5, 0.0, 1.0, 1.0, 0.0, 0.0, //5
+        0.5, -0.5, -0.5, 0.0, 1.0, 1.0, 0.0, 0.0, //6
+        0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 0.0, 0.0, //2
 
-        0.5, -0.5, 0.5,  0.0, 1.0, 1.0, 0.0, 0.0, //5
-        0.5, 0.5, -0.5,  1.0, 1.0, 1.0, 0.0, 0.0, //2
-        0.5, 0.5, 0.5,  1.0, 1.0, 1.0, 0.0, 0.0, //1
+        0.5, -0.5, 0.5, 0.0, 1.0, 1.0, 0.0, 0.0, //5
+        0.5, 0.5, -0.5, 1.0, 1.0, 1.0, 0.0, 0.0, //2
+        0.5, 0.5, 0.5, 1.0, 1.0, 1.0, 0.0, 0.0, //1
 
-        -0.5, 0.5, -0.5,  0.0, 1.0, -1.0, 0.0, 0.0, //4
-        -0.5, -0.5, -0.5,  0.0, 0.0, -1.0, 0.0, 0.0, //8
-        -0.5, -0.5, 0.5,  0.0, 0.0, -1.0, 0.0, 0.0, //7
+        -0.5, 0.5, -0.5, 0.0, 1.0, -1.0, 0.0, 0.0, //4
+        -0.5, -0.5, -0.5, 0.0, 0.0, -1.0, 0.0, 0.0, //8
+        -0.5, -0.5, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, //7
 
-        -0.5, 0.5, 0.5,  0.0, 1.0, -1.0, 0.0, 0.0, //3
-        -0.5, 0.5, -0.5,  0.0, 1.0, -1.0, 0.0, 0.0, //4
-        -0.5, -0.5, 0.5,  0.0, 0.0, -1.0, 0.0, 0.0, //7
-
-        -0.5, -0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, //7
-        0.5, -0.5, 0.5,  1.0, 0.0, 0.0, 0.0, 1.0, //5
-        0.5, 0.5, 0.5,  1.0, 1.0, 0.0, 0.0, 1.0, //1
+        -0.5, 0.5, 0.5, 0.0, 1.0, -1.0, 0.0, 0.0, //3
+        -0.5, 0.5, -0.5, 0.0, 1.0, -1.0, 0.0, 0.0, //4
+        -0.5, -0.5, 0.5, 0.0, 0.0, -1.0, 0.0, 0.0, //7
 
         -0.5, -0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, //7
-        0.5, 0.5, 0.5,  1.0, 1.0, 0.0, 0.0, 1.0, //1
-        -0.5, 0.5, 0.5,  0.0, 1.0, 0.0, 0.0, 1.0, //3
+        0.5, -0.5, 0.5, 1.0, 0.0, 0.0, 0.0, 1.0, //5
+        0.5, 0.5, 0.5, 1.0, 1.0, 0.0, 0.0, 1.0, //1
 
-        0.5, -0.5, -0.5,  1.0, 0.0, 0.0, -1.0, 0.0, //6
-        0.5, -0.5, 0.5,  1.0, 0.0, 0.0, -1.0, 0.0, //5
-        -0.5, -0.5, 0.5,  0.0, 0.0, 0.0, -1.0, 0.0, //7
+        -0.5, -0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 1.0, //7
+        0.5, 0.5, 0.5, 1.0, 1.0, 0.0, 0.0, 1.0, //1
+        -0.5, 0.5, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, //3
 
-        -0.5, -0.5, -0.5,  0.0, 0.0, 0.0, -1.0, 0.0, //8
-        0.5, -0.5, -0.5,  1.0, 0.0, 0.0, -1.0, 0.0, //6
-        -0.5, -0.5, 0.5,  0.0, 0.0, 0.0, -1.0, 0.0, //7
+        0.5, -0.5, -0.5, 1.0, 0.0, 0.0, -1.0, 0.0, //6
+        0.5, -0.5, 0.5, 1.0, 0.0, 0.0, -1.0, 0.0, //5
+        -0.5, -0.5, 0.5, 0.0, 0.0, 0.0, -1.0, 0.0, //7
+
+        -0.5, -0.5, -0.5, 0.0, 0.0, 0.0, -1.0, 0.0, //8
+        0.5, -0.5, -0.5, 1.0, 0.0, 0.0, -1.0, 0.0, //6
+        -0.5, -0.5, 0.5, 0.0, 0.0, 0.0, -1.0, 0.0, //7
     ];
 
     // Generate a buffer object
@@ -198,92 +200,265 @@ function get_projection(angle, a, zMin, zMax) {
 }
 
 var proj_matrix = get_projection(30, 1.0, 1, 15.0);
-var mov_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-var view_matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+var view_matrix = create$3();
 // translating z
 view_matrix[14] = view_matrix[14] - 4;//zoom
 
-function idMatrix(m) {
-    m[0] = 1; m[1] = 0; m[2] = 0; m[3] = 0;
-    m[4] = 0; m[5] = 1; m[6] = 0; m[7] = 0;
-    m[8] = 0; m[9] = 0; m[10] = 1; m[11] = 0;
-    m[12] = 0; m[13] = 0; m[14] = 0; m[15] = 1;
+function multiply$3(out, a, b) {
+    var a00 = a[0],
+        a01 = a[1],
+        a02 = a[2],
+        a03 = a[3];
+    var a10 = a[4],
+        a11 = a[5],
+        a12 = a[6],
+        a13 = a[7];
+    var a20 = a[8],
+        a21 = a[9],
+        a22 = a[10],
+        a23 = a[11];
+    var a30 = a[12],
+        a31 = a[13],
+        a32 = a[14],
+        a33 = a[15]; // Cache only the current line of the second matrix
+
+    var b0 = b[0],
+        b1 = b[1],
+        b2 = b[2],
+        b3 = b[3];
+    out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+    out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+    out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+    out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+    b0 = b[4];
+    b1 = b[5];
+    b2 = b[6];
+    b3 = b[7];
+    out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+    out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+    out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+    out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+    b0 = b[8];
+    b1 = b[9];
+    b2 = b[10];
+    b3 = b[11];
+    out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+    out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+    out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+    out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+    b0 = b[12];
+    b1 = b[13];
+    b2 = b[14];
+    b3 = b[15];
+    out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+    out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+    out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+    out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+    return out;
 }
 
-function mulStoreMatrix(r, m, k) {
-    m0 = m[0]; m1 = m[1]; m2 = m[2]; m3 = m[3]; m4 = m[4]; m5 = m[5]; m6 = m[6]; m7 = m[7];
-    m8 = m[8]; m9 = m[9]; m10 = m[10]; m11 = m[11]; m12 = m[12]; m13 = m[13]; m14 = m[14]; m15 = m[15];
-    k0 = k[0]; k1 = k[1]; k2 = k[2]; k3 = k[3]; k4 = k[4]; k5 = k[5]; k6 = k[6]; k7 = k[7];
-    k8 = k[8]; k9 = k[9]; k10 = k[10]; k11 = k[11]; k12 = k[12]; k13 = k[13]; k14 = k[14]; k15 = k[15];
+function create$3() {
+    var out = new ARRAY_TYPE(16);
 
-    a0 = k0 * m0 + k3 * m12 + k1 * m4 + k2 * m8;
-    a4 = k4 * m0 + k7 * m12 + k5 * m4 + k6 * m8;
-    a8 = k8 * m0 + k11 * m12 + k9 * m4 + k10 * m8;
-    a12 = k12 * m0 + k15 * m12 + k13 * m4 + k14 * m8;
+    if (ARRAY_TYPE != Float32Array) {
+        out[1] = 0;
+        out[2] = 0;
+        out[3] = 0;
+        out[4] = 0;
+        out[6] = 0;
+        out[7] = 0;
+        out[8] = 0;
+        out[9] = 0;
+        out[11] = 0;
+        out[12] = 0;
+        out[13] = 0;
+        out[14] = 0;
+    }
 
-    a1 = k0 * m1 + k3 * m13 + k1 * m5 + k2 * m9;
-    a5 = k4 * m1 + k7 * m13 + k5 * m5 + k6 * m9;
-    a9 = k8 * m1 + k11 * m13 + k9 * m5 + k10 * m9;
-    a13 = k12 * m1 + k15 * m13 + k13 * m5 + k14 * m9;
-
-    a2 = k2 * m10 + k3 * m14 + k0 * m2 + k1 * m6;
-    a6 = k6 * m10 + k7 * m14 + k4 * m2 + k5 * m6;
-    a10 = k10 * m10 + k11 * m14 + k8 * m2 + k9 * m6;
-    a14 = k14 * m10 + k15 * m14 + k12 * m2 + k13 * m6;
-
-    a3 = k2 * m11 + k3 * m15 + k0 * m3 + k1 * m7;
-    a7 = k6 * m11 + k7 * m15 + k4 * m3 + k5 * m7;
-    a11 = k10 * m11 + k11 * m15 + k8 * m3 + k9 * m7;
-    a15 = k14 * m11 + k15 * m15 + k12 * m3 + k13 * m7;
-
-    r[0] = a0; r[1] = a1; r[2] = a2; r[3] = a3; r[4] = a4; r[5] = a5; r[6] = a6; r[7] = a7;
-    r[8] = a8; r[9] = a9; r[10] = a10; r[11] = a11; r[12] = a12; r[13] = a13; r[14] = a14; r[15] = a15;
+    out[0] = 1;
+    out[5] = 1;
+    out[10] = 1;
+    out[15] = 1;
+    return out;
 }
 
-function mulMatrix(m, k) {
-    mulStoreMatrix(m, m, k);
+function translate$2(out, a, v) {
+    var x = v[0],
+        y = v[1],
+        z = v[2];
+    var a00, a01, a02, a03;
+    var a10, a11, a12, a13;
+    var a20, a21, a22, a23;
+
+    if (a === out) {
+        out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
+        out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
+        out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
+        out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
+    } else {
+        a00 = a[0];
+        a01 = a[1];
+        a02 = a[2];
+        a03 = a[3];
+        a10 = a[4];
+        a11 = a[5];
+        a12 = a[6];
+        a13 = a[7];
+        a20 = a[8];
+        a21 = a[9];
+        a22 = a[10];
+        a23 = a[11];
+        out[0] = a00;
+        out[1] = a01;
+        out[2] = a02;
+        out[3] = a03;
+        out[4] = a10;
+        out[5] = a11;
+        out[6] = a12;
+        out[7] = a13;
+        out[8] = a20;
+        out[9] = a21;
+        out[10] = a22;
+        out[11] = a23;
+        out[12] = a00 * x + a10 * y + a20 * z + a[12];
+        out[13] = a01 * x + a11 * y + a21 * z + a[13];
+        out[14] = a02 * x + a12 * y + a22 * z + a[14];
+        out[15] = a03 * x + a13 * y + a23 * z + a[15];
+    }
+
+    return out;
 }
 
-function translate(m, tx, ty, tz) {
-    var tm = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-    tm[12] = tx; tm[13] = ty; tm[14] = tz;
-    mulMatrix(m, tm);
+
+function rotateX(out, a, rad) {
+    var s = Math.sin(rad);
+    var c = Math.cos(rad);
+    var a10 = a[4];
+    var a11 = a[5];
+    var a12 = a[6];
+    var a13 = a[7];
+    var a20 = a[8];
+    var a21 = a[9];
+    var a22 = a[10];
+    var a23 = a[11];
+
+    if (a !== out) {
+        // If the source and destination differ, copy the unchanged rows
+        out[0] = a[0];
+        out[1] = a[1];
+        out[2] = a[2];
+        out[3] = a[3];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    } // Perform axis-specific matrix multiplication
+
+
+    out[4] = a10 * c + a20 * s;
+    out[5] = a11 * c + a21 * s;
+    out[6] = a12 * c + a22 * s;
+    out[7] = a13 * c + a23 * s;
+    out[8] = a20 * c - a10 * s;
+    out[9] = a21 * c - a11 * s;
+    out[10] = a22 * c - a12 * s;
+    out[11] = a23 * c - a13 * s;
+    return out;
 }
 
+function rotateY(out, a, rad) {
+    var s = Math.sin(rad);
+    var c = Math.cos(rad);
+    var a00 = a[0];
+    var a01 = a[1];
+    var a02 = a[2];
+    var a03 = a[3];
+    var a20 = a[8];
+    var a21 = a[9];
+    var a22 = a[10];
+    var a23 = a[11];
 
-function rotateX(m, angle) {
-    var rm = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-    var c = Math.cos(angle);
-    var s = Math.sin(angle);
+    if (a !== out) {
+        // If the source and destination differ, copy the unchanged rows
+        out[4] = a[4];
+        out[5] = a[5];
+        out[6] = a[6];
+        out[7] = a[7];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    } // Perform axis-specific matrix multiplication
 
-    rm[5] = c; rm[6] = s;
-    rm[9] = -s; rm[10] = c;
-    mulMatrix(m, rm);
+
+    out[0] = a00 * c - a20 * s;
+    out[1] = a01 * c - a21 * s;
+    out[2] = a02 * c - a22 * s;
+    out[3] = a03 * c - a23 * s;
+    out[8] = a00 * s + a20 * c;
+    out[9] = a01 * s + a21 * c;
+    out[10] = a02 * s + a22 * c;
+    out[11] = a03 * s + a23 * c;
+    return out;
 }
 
-function rotateY(m, angle) {
-    var rm = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-    var c = Math.cos(angle);
-    var s = Math.sin(angle);
+function rotateZ(out, a, rad) {
+    var s = Math.sin(rad);
+    var c = Math.cos(rad);
+    var a00 = a[0];
+    var a01 = a[1];
+    var a02 = a[2];
+    var a03 = a[3];
+    var a10 = a[4];
+    var a11 = a[5];
+    var a12 = a[6];
+    var a13 = a[7];
 
-    rm[0] = c; rm[2] = -s;
-    rm[8] = s; rm[10] = c;
-    mulMatrix(m, rm);
+    if (a !== out) {
+        // If the source and destination differ, copy the unchanged last row
+        out[8] = a[8];
+        out[9] = a[9];
+        out[10] = a[10];
+        out[11] = a[11];
+        out[12] = a[12];
+        out[13] = a[13];
+        out[14] = a[14];
+        out[15] = a[15];
+    } // Perform axis-specific matrix multiplication
+
+
+    out[0] = a00 * c + a10 * s;
+    out[1] = a01 * c + a11 * s;
+    out[2] = a02 * c + a12 * s;
+    out[3] = a03 * c + a13 * s;
+    out[4] = a10 * c - a00 * s;
+    out[5] = a11 * c - a01 * s;
+    out[6] = a12 * c - a02 * s;
+    out[7] = a13 * c - a03 * s;
+    return out;
 }
 
-function rotateZ(m, angle) {
-    var rm = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-    var c = Math.cos(angle);
-    var s = Math.sin(angle);
-
-    rm[0] = c; rm[1] = s;
-    rm[4] = -s; rm[5] = c;
-    mulMatrix(m, rm);
-}
-
-function scale(m, sx, sy, sz) {
-    var rm = [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1];
-    mulMatrix(m, rm);
+function scale$3(out, a, v) {
+    var x = v[0],
+        y = v[1],
+        z = v[2];
+    out[0] = a[0] * x;
+    out[1] = a[1] * x;
+    out[2] = a[2] * x;
+    out[3] = a[3] * x;
+    out[4] = a[4] * y;
+    out[5] = a[5] * y;
+    out[6] = a[6] * y;
+    out[7] = a[7] * y;
+    out[8] = a[8] * z;
+    out[9] = a[9] * z;
+    out[10] = a[10] * z;
+    out[11] = a[11] * z;
+    out[12] = a[12];
+    out[13] = a[13];
+    out[14] = a[14];
+    out[15] = a[15];
+    return out;
 }
 
 function normalizeVec3(v) {
@@ -328,7 +503,7 @@ function rotateArbAxis(m, angle, axis) {
     rm[14] = 0;
     rm[15] = 1;
 
-    mulMatrix(m, rm);
+    multiply$3(m, m, rm);
 }
 
 rotValue = 0.0;
@@ -361,8 +536,6 @@ function renderScene(time) {
     var color_location = gl.getUniformLocation(gl.programObject, "brickColor");
     var lightVector_location = gl.getUniformLocation(gl.programObject, "lightVector");
 
-    idMatrix(mov_matrix);
-    
     gl.uniformMatrix4fv(Pmatrix, false, proj_matrix);
     gl.uniformMatrix4fv(Vmatrix, false, view_matrix);
     gl.uniform3fv(lightVector_location, [lightVector.x, lightVector.y, lightVector.z])
@@ -395,21 +568,26 @@ function renderScene(time) {
 
     for (i in bricks) {
         var brick = bricks[i]
-        brick_mov_matrix = mov_matrix.slice();
 
-        scale(brick_mov_matrix,
-            brick.transform.scale.x,
-            brick.transform.scale.y,
-            brick.transform.scale.z,
-        )
-        translate(brick_mov_matrix, 
-            brick.transform.position.x, 
-            brick.transform.position.y, 
-            brick.transform.position.z);
-   
-        rotateY(brick_mov_matrix, brick.transform.rotation.y);
-        rotateX(brick_mov_matrix, brick.transform.rotation.x);
-        rotateZ(brick_mov_matrix, brick.transform.rotation.z);
+        var brick_mov_matrix = create$3();
+        scale$3(brick_mov_matrix, brick_mov_matrix,
+            [
+                brick.transform.scale.x,
+                brick.transform.scale.y,
+                brick.transform.scale.z
+            ]
+        );
+
+        translate$2(brick_mov_matrix, brick_mov_matrix,
+            [
+                brick.transform.position.x,
+                brick.transform.position.y,
+                brick.transform.position.z
+            ]);
+
+        rotateY(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.y);
+        rotateX(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.x);
+        rotateZ(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.z);
 
         time_old = time;
 
@@ -418,7 +596,7 @@ function renderScene(time) {
         gl.uniform4fv(color_location, [color.r, color.g, color.b, color.a])
         gl.drawArrays(gl.TRIANGLES, 0, 36);
     }
-    
+
     if (!testGLError("gl.drawArrays")) {
         return false;
     }
@@ -431,13 +609,13 @@ var old_x, old_y;
 var dX = 0, dY = 0;
 var is_holding_left_shift = false;
 
-var keyDown = function(e) {
+var keyDown = function (e) {
     if (e.keyCode == 16) {
         is_holding_left_shift = true;
     }
 };
 
-var keyUp = function(e) {
+var keyUp = function (e) {
     if (e.keyCode == 16) {
         is_holding_left_shift = false;
     }
@@ -457,7 +635,7 @@ var mouseUp = function (e) {
 var mouseMove = function (e) {
     if (!drag) return false;
     dX = (e.pageX - old_x) * 2 * Math.PI / canvas.width,
-    dY = (e.pageY - old_y) * 2 * Math.PI / canvas.height;
+        dY = (e.pageY - old_y) * 2 * Math.PI / canvas.height;
     var brick = bricks[selectedIndex];
     if (is_holding_left_shift) {
         brick.transform.position.y += -dY;
@@ -482,7 +660,7 @@ function mouseWheel(e) {
 function main() {
     window.addEventListener("keydown", keyDown, false);
     window.addEventListener("keyup", keyUp, false);
-    
+
     var canvas = document.getElementById("canvas");
     canvas.addEventListener("mousedown", mouseDown, false);
     canvas.addEventListener("mouseup", mouseUp, false);
@@ -535,10 +713,10 @@ function addBrick() {
     var brickButton = document.createElement("button");
     brickButton.innerHTML = "Brick" + bricks.length;
     selectBrick(brick);
-    brickButton.onclick = function() {
+    brickButton.onclick = function () {
         selectBrick(brick);
     }
-    
+
     brickButtonList.appendChild(brickButton);
 }
 
@@ -551,15 +729,15 @@ function updateBrickInformation(brick) {
     document.getElementById("scale_x").value = brick.transform.scale.x;
     document.getElementById("scale_y").value = brick.transform.scale.y;
     document.getElementById("scale_z").value = brick.transform.scale.z;
-    
+
     document.getElementById("position_x").value = brick.transform.position.x;
     document.getElementById("position_y").value = brick.transform.position.y;
     document.getElementById("position_z").value = brick.transform.position.z;
-    
+
     document.getElementById("rotation_x").value = brick.transform.rotation.x;
     document.getElementById("rotation_y").value = brick.transform.rotation.y;
     document.getElementById("rotation_z").value = brick.transform.rotation.z;
-    
+
     document.getElementById("color_r").value = brick.color.r;
     document.getElementById("color_g").value = brick.color.g;
     document.getElementById("color_b").value = brick.color.b;
@@ -568,71 +746,71 @@ function updateBrickInformation(brick) {
 
 function setOnInput() {
     var scale_x = document.getElementById("scale_x");
-    scale_x.oninput = function() {
+    scale_x.oninput = function () {
         bricks[selectedIndex].transform.scale.x = scale_x.value;
     };
     var scale_y = document.getElementById("scale_y");
-    scale_y.oninput = function() {
+    scale_y.oninput = function () {
         bricks[selectedIndex].transform.scale.y = scale_y.value;
     };
     var scale_z = document.getElementById("scale_z");
-    scale_z.oninput = function() {
+    scale_z.oninput = function () {
         bricks[selectedIndex].transform.scale.z = scale_z.value;
     };
 
     var position_x = document.getElementById("position_x");
-    position_x.oninput = function() {
+    position_x.oninput = function () {
         bricks[selectedIndex].transform.position.x = position_x.value;
     };
     var position_y = document.getElementById("position_y");
-    position_y.oninput = function() {
+    position_y.oninput = function () {
         bricks[selectedIndex].transform.position.y = position_y.value;
     };
     var position_z = document.getElementById("position_z");
-    position_z.oninput = function() {
+    position_z.oninput = function () {
         bricks[selectedIndex].transform.position.z = position_z.value;
     };
 
     var rotation_x = document.getElementById("rotation_x");
-    rotation_x.oninput = function() {
+    rotation_x.oninput = function () {
         bricks[selectedIndex].transform.rotation.x = rotation_x.value;
     };
     var rotation_y = document.getElementById("rotation_y");
-    rotation_y.oninput = function() {
+    rotation_y.oninput = function () {
         bricks[selectedIndex].transform.rotation.y = rotation_y.value;
     };
     var rotation_z = document.getElementById("rotation_z");
-    rotation_z.oninput = function() {
+    rotation_z.oninput = function () {
         bricks[selectedIndex].transform.rotation.z = rotation_z.value;
     };
 
     var color_r = document.getElementById("color_r");
-    color_r.oninput = function() {
+    color_r.oninput = function () {
         bricks[selectedIndex].color.r = color_r.value;
     };
     var color_g = document.getElementById("color_g");
-    color_g.oninput = function() {
+    color_g.oninput = function () {
         bricks[selectedIndex].color.g = color_g.value;
     };
     var color_b = document.getElementById("color_b");
-    color_b.oninput = function() {
+    color_b.oninput = function () {
         bricks[selectedIndex].color.b = color_b.value;
     };
     var color_a = document.getElementById("color_a");
-    color_a.oninput = function() {
+    color_a.oninput = function () {
         bricks[selectedIndex].color.a = color_a.value;
     };
 
     var light_x = document.getElementById("light_x");
-    light_x.oninput = function() {
+    light_x.oninput = function () {
         lightVector.x = light_x.value;
     }
     var light_y = document.getElementById("light_y");
-    light_y.oninput = function() {
+    light_y.oninput = function () {
         lightVector.y = light_y.value;
     }
     var light_z = document.getElementById("light_z");
-    light_z.oninput = function() {
+    light_z.oninput = function () {
         lightVector.z = light_z.value;
     }
 }
