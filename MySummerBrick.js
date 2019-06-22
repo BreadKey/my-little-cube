@@ -11,7 +11,7 @@ class Brick {
 
 var gl;
 
-var bricks = [new Brick()];
+var bricks = [];
 var selectedIndex = 0;
 
 function testGLError(functionLastCalled) {
@@ -389,24 +389,25 @@ function renderScene(time) {
 
     for (i in bricks) {
         var brick = bricks[i]
+        brick_mov_matrix = mov_matrix.slice();
 
-        scale(mov_matrix,
+        scale(brick_mov_matrix,
             brick.transform.scale.x,
             brick.transform.scale.y,
             brick.transform.scale.z,
         )
-        translate(mov_matrix, 
+        translate(brick_mov_matrix, 
             brick.transform.position.x, 
             brick.transform.position.y, 
             brick.transform.position.z);
    
-        rotateY(mov_matrix, brick.transform.rotation.y);
-        rotateX(mov_matrix, brick.transform.rotation.x);
-        rotateZ(mov_matrix, brick.transform.rotation.z);
+        rotateY(brick_mov_matrix, brick.transform.rotation.y);
+        rotateX(brick_mov_matrix, brick.transform.rotation.x);
+        rotateZ(brick_mov_matrix, brick.transform.rotation.z);
 
         time_old = time;
 
-        gl.uniformMatrix4fv(Mmatrix, false, mov_matrix);
+        gl.uniformMatrix4fv(Mmatrix, false, brick_mov_matrix);
         var color = brick.color
         gl.uniform4fv(color_location, [color.r, color.g, color.b, color.a])
         gl.drawArrays(gl.TRIANGLES, 0, 36);
@@ -471,6 +472,7 @@ function main() {
     canvas.addEventListener("mouseup", mouseUp, false);
     canvas.addEventListener("mouseout", mouseUp, false);
     canvas.addEventListener("mousemove", mouseMove, false);
+    addBrick()
     console.log("Start");
 
     if (!initialiseGL(canvas)) {
@@ -502,4 +504,18 @@ function main() {
             requestAnimFrame(renderLoop);
         }
     })();
+}
+
+function addBrick() {
+    var brick = new Brick();
+    bricks.push(brick);
+    var brickButtonList = document.getElementById("brick_button_list");
+
+    var brickButton = document.createElement("button");
+    brickButton.innerHTML = "Brick" + bricks.length;
+    brickButton.onclick = function() {
+        selectedIndex = bricks.indexOf(brick);
+    }
+    
+    brickButtonList.appendChild(brickButton);
 }

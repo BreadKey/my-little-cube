@@ -1,4 +1,10 @@
 <html>
+    <style>
+        .button_list button {
+            margin: 1%;
+            width: 98%;
+        }
+    </style>
 
     <head>
         <title>WebGLHelloAPI</title>
@@ -8,9 +14,12 @@
     </head>
 
     <body onload="main()">
-        <canvas id="canvas" style="border: none;" width="400" height="400"></canvas>
-        <div>
+        <canvas id="canvas" style="border: none; float: left;" width="400" height="400"></canvas>
+        <div class="button_list" style="margin-left: 1%; position: relative; background: gray; float: left; width: 150px; height: 400px;">
+            <div id="brick_button_list" style="overflow-y: auto; height: 90%;">
 
+            </div>
+            <button style="position: absolute; bottom: 0px;" onclick="addBrick()">Add Brick</button>
         </div>
     </body>
 </html>
