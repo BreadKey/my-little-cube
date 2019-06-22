@@ -505,9 +505,7 @@ function renderScene(time) {
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    for (i in cubes) {
-        var cube = cubes[i]
-
+    cubes.forEach(function(cube, index) {
         var cube_mov_matrix = create$3();
 
         translate$2(cube_mov_matrix, cube_mov_matrix,
@@ -535,7 +533,7 @@ function renderScene(time) {
         var color = cube.color
         gl.uniform4fv(color_location, [color.r, color.g, color.b, color.a])
         gl.drawArrays(gl.TRIANGLES, 0, 36);
-    }
+    });
 
     if (!testGLError("gl.drawArrays")) {
         return false;
@@ -685,43 +683,43 @@ function selectCube(cube) {
 }
 
 function updateCubeInformation(cube) {
-    AXES.forEach(function(axis, index) {
+    AXES.forEach(function (axis, index) {
         document.getElementById("scale_" + axis).value = cube.transform.scale[axis];
         document.getElementById("position_" + axis).value = cube.transform.position[axis];
         document.getElementById("rotation_" + axis).value = cube.transform.rotation[axis];
     });
 
-    RGBA.forEach(function(element, index) {
+    RGBA.forEach(function (element, index) {
         document.getElementById("color_" + element).value = cube.color[element];
     });
 }
 
 function setOnInput() {
-    AXES.forEach(function(axis, index) {
+    AXES.forEach(function (axis, index) {
         var scale = document.getElementById("scale_" + axis);
-        scale.oninput = function() {
+        scale.oninput = function () {
             cubes[selectedIndex].transform.scale[axis] = scale.value;
         };
 
         var position = document.getElementById("position_" + axis);
-        position.oninput = function() {
+        position.oninput = function () {
             cubes[selectedIndex].transform.position[axis] = position.value;
         };
 
         var rotation = document.getElementById("rotation_" + axis);
-        rotation.oninput = function() {
+        rotation.oninput = function () {
             cubes[selectedIndex].transform.rotation[axis] = rotation.value;
         };
 
         var light = document.getElementById("light_" + axis);
-        light.oninput = function() {
+        light.oninput = function () {
             lightVector[axis] = light.value;
         }
     });
 
-    RGBA.forEach(function(element, index) {
+    RGBA.forEach(function (element, index) {
         var color = document.getElementById('color_' + element);
-        color.oninput = function() {
+        color.oninput = function () {
             cubes[selectedIndex].color[element] = color.value;
         }
     })
