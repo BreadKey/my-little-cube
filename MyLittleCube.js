@@ -542,6 +542,7 @@ function renderScene(time) {
     return true;
 }
 
+// Mouse actions refer to https://www.tutorialspoint.com/webgl/webgl_interactive_cube.htm
 var drag = false;
 var old_x, old_y;
 var dX = 0, dY = 0;
