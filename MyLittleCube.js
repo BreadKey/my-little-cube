@@ -701,72 +701,34 @@ function updatecubeInformation(cube) {
 }
 
 function setOnInput() {
-    var scale_x = document.getElementById("scale_x");
-    scale_x.oninput = function () {
-        cubes[selectedIndex].transform.scale.x = scale_x.value;
-    };
-    var scale_y = document.getElementById("scale_y");
-    scale_y.oninput = function () {
-        cubes[selectedIndex].transform.scale.y = scale_y.value;
-    };
-    var scale_z = document.getElementById("scale_z");
-    scale_z.oninput = function () {
-        cubes[selectedIndex].transform.scale.z = scale_z.value;
-    };
+    var axes = ['x', 'y', 'z']
+    axes.forEach(function(axis, index) {
+        var scale = document.getElementById("scale_" + axis);
+        scale.oninput = function() {
+            cubes[selectedIndex].transform.scale[axis] = scale.value;
+        };
 
-    var position_x = document.getElementById("position_x");
-    position_x.oninput = function () {
-        cubes[selectedIndex].transform.position.x = position_x.value;
-    };
-    var position_y = document.getElementById("position_y");
-    position_y.oninput = function () {
-        cubes[selectedIndex].transform.position.y = position_y.value;
-    };
-    var position_z = document.getElementById("position_z");
-    position_z.oninput = function () {
-        cubes[selectedIndex].transform.position.z = position_z.value;
-    };
+        var position = document.getElementById("position_" + axis);
+        position.oninput = function() {
+            cubes[selectedIndex].transform.position[axis] = position.value;
+        };
 
-    var rotation_x = document.getElementById("rotation_x");
-    rotation_x.oninput = function () {
-        cubes[selectedIndex].transform.rotation.x = rotation_x.value;
-    };
-    var rotation_y = document.getElementById("rotation_y");
-    rotation_y.oninput = function () {
-        cubes[selectedIndex].transform.rotation.y = rotation_y.value;
-    };
-    var rotation_z = document.getElementById("rotation_z");
-    rotation_z.oninput = function () {
-        cubes[selectedIndex].transform.rotation.z = rotation_z.value;
-    };
+        var rotation = document.getElementById("rotation_" + axis);
+        rotation.oninput = function() {
+            cubes[selectedIndex].transform.rotation[axis] = rotation.value;
+        };
 
-    var color_r = document.getElementById("color_r");
-    color_r.oninput = function () {
-        cubes[selectedIndex].color.r = color_r.value;
-    };
-    var color_g = document.getElementById("color_g");
-    color_g.oninput = function () {
-        cubes[selectedIndex].color.g = color_g.value;
-    };
-    var color_b = document.getElementById("color_b");
-    color_b.oninput = function () {
-        cubes[selectedIndex].color.b = color_b.value;
-    };
-    var color_a = document.getElementById("color_a");
-    color_a.oninput = function () {
-        cubes[selectedIndex].color.a = color_a.value;
-    };
+        var light = document.getElementById("light_" + axis);
+        light.oninput = function() {
+            lightVector[axis] = light.value;
+        }
+    });
 
-    var light_x = document.getElementById("light_x");
-    light_x.oninput = function () {
-        lightVector.x = light_x.value;
-    }
-    var light_y = document.getElementById("light_y");
-    light_y.oninput = function () {
-        lightVector.y = light_y.value;
-    }
-    var light_z = document.getElementById("light_z");
-    light_z.oninput = function () {
-        lightVector.z = light_z.value;
-    }
+    var rgba = ['r', 'g', 'b', 'a']
+    rgba.forEach(function(element, index) {
+        var color = document.getElementById('color_' + element);
+        color.oninput = function() {
+            cubes[selectedIndex].color[element] = color.value;
+        }
+    })
 }
