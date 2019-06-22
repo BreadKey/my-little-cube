@@ -1,6 +1,6 @@
 // (CC-NC-BY) 이영기 2019
 
-class Brick {
+class Cube {
     constructor() {
         this.color = { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };
         this.transform = {
@@ -18,7 +18,7 @@ var lightVector = {
     x: 1, y: 1, z: 1
 };
 
-var bricks = [];
+var cubes = [];
 var selectedIndex = 0;
 
 function testGLError(functionLastCalled) {
@@ -133,7 +133,7 @@ function initialiseShaders() {
 			attribute highp vec3 myVertex; \
 			attribute highp vec2 myUV; \
 			attribute highp vec3 myNormal; \
-            uniform highp vec4 brickColor; \
+            uniform highp vec4 cubeColor; \
             uniform mediump mat4 Pmatrix; \
 			uniform mediump mat4 Vmatrix; \
 			uniform mediump mat4 Mmatrix; \
@@ -154,8 +154,8 @@ function initialiseShaders() {
 				v5 = normalize(v3.xyz); \
 				gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(myVertex, 1.0); \
                 nN = Nmatrix * vec4(myNormal, 1.0); \
-				color = brickColor * 0.5 * (dot(v5, lightVector) + 1.0); \
-				color.a = brickColor.a; \
+				color = cubeColor * 0.5 * (dot(v5, lightVector) + 1.0); \
+				color.a = cubeColor.a; \
 				texCoord = myUV; \
 			}';
 
@@ -469,7 +469,7 @@ function renderScene(time) {
     var Vmatrix = gl.getUniformLocation(gl.programObject, "Vmatrix");
     var Mmatrix = gl.getUniformLocation(gl.programObject, "Mmatrix");
     var Nmatrix = gl.getUniformLocation(gl.programObject, "Nmatrix");
-    var color_location = gl.getUniformLocation(gl.programObject, "brickColor");
+    var color_location = gl.getUniformLocation(gl.programObject, "cubeColor");
     var lightVector_location = gl.getUniformLocation(gl.programObject, "lightVector");
 
     gl.uniformMatrix4fv(Pmatrix, false, proj_matrix);
@@ -502,34 +502,34 @@ function renderScene(time) {
     gl.clearDepth(1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    for (i in bricks) {
-        var brick = bricks[i]
+    for (i in cubes) {
+        var cube = cubes[i]
 
-        var brick_mov_matrix = create$3();
+        var cube_mov_matrix = create$3();
 
-        translate$2(brick_mov_matrix, brick_mov_matrix,
+        translate$2(cube_mov_matrix, cube_mov_matrix,
             [
-                brick.transform.position.x,
-                brick.transform.position.y,
-                brick.transform.position.z
+                cube.transform.position.x,
+                cube.transform.position.y,
+                cube.transform.position.z
             ]);
 
-        rotateY(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.y);
-        rotateX(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.x);
-        rotateZ(brick_mov_matrix, brick_mov_matrix, brick.transform.rotation.z);
+        rotateY(cube_mov_matrix, cube_mov_matrix, cube.transform.rotation.y);
+        rotateX(cube_mov_matrix, cube_mov_matrix, cube.transform.rotation.x);
+        rotateZ(cube_mov_matrix, cube_mov_matrix, cube.transform.rotation.z);
 
-        scale$3(brick_mov_matrix, brick_mov_matrix,
+        scale$3(cube_mov_matrix, cube_mov_matrix,
             [
-                brick.transform.scale.x,
-                brick.transform.scale.y,
-                brick.transform.scale.z
+                cube.transform.scale.x,
+                cube.transform.scale.y,
+                cube.transform.scale.z
             ]
         );
-        
+
         time_old = time;
 
-        gl.uniformMatrix4fv(Mmatrix, false, brick_mov_matrix);
-        var color = brick.color
+        gl.uniformMatrix4fv(Mmatrix, false, cube_mov_matrix);
+        var color = cube.color
         gl.uniform4fv(color_location, [color.r, color.g, color.b, color.a])
         gl.drawArrays(gl.TRIANGLES, 0, 36);
     }
@@ -573,17 +573,17 @@ var mouseMove = function (e) {
     if (!drag) return false;
     dX = (e.pageX - old_x) * 2 * Math.PI / canvas.width,
         dY = (e.pageY - old_y) * 2 * Math.PI / canvas.height;
-    var brick = bricks[selectedIndex];
+    var cube = cubes[selectedIndex];
     if (is_holding_left_shift) {
-        brick.transform.position.y += -dY;
-        brick.transform.position.x += dX;
-        document.getElementById("position_x").value = brick.transform.position.x;
-        document.getElementById("position_y").value = brick.transform.position.y;
+        cube.transform.position.y += -dY;
+        cube.transform.position.x += dX;
+        document.getElementById("position_x").value = cube.transform.position.x;
+        document.getElementById("position_y").value = cube.transform.position.y;
     } else {
-        brick.transform.rotation.y += dX;
-        brick.transform.rotation.x += dY;
-        document.getElementById("rotation_x").value = brick.transform.rotation.x;
-        document.getElementById("rotation_y").value = brick.transform.rotation.y;
+        cube.transform.rotation.y += dX;
+        cube.transform.rotation.x += dY;
+        document.getElementById("rotation_x").value = cube.transform.rotation.x;
+        document.getElementById("rotation_y").value = cube.transform.rotation.y;
     };
     old_x = e.pageX, old_y = e.pageY;
     e.preventDefault();
@@ -604,7 +604,7 @@ function main() {
     canvas.addEventListener("mouseout", mouseUp, false);
     canvas.addEventListener("mousemove", mouseMove, false);
     canvas.addEventListener("mousewheel", mouseWheel, false);
-    addBrick();
+    addCube();
     setOnInput();
     document.getElementById("light_x").value = lightVector.x;
     document.getElementById("light_y").value = lightVector.y;
@@ -642,100 +642,100 @@ function main() {
     })();
 }
 
-function addBrick() {
-    var brick = new Brick();
-    bricks.push(brick);
-    var brickButtonList = document.getElementById("brick_button_list");
+function addCube() {
+    var cube = new Cube();
+    cubes.push(cube);
+    var cubeButtonList = document.getElementById("cube_button_list");
 
-    var brickButton = document.createElement("button");
-    brickButton.innerHTML = "Brick" + bricks.length;
-    selectBrick(brick);
-    brickButton.onclick = function () {
-        selectBrick(brick);
+    var cubeButton = document.createElement("button");
+    cubeButton.innerHTML = "Cube" + cubes.length;
+    selectCube(cube);
+    cubeButton.onclick = function () {
+        selectCube(cube);
     }
 
-    brickButtonList.appendChild(brickButton);
+    cubeButtonList.appendChild(cubeButton);
 }
 
-function selectBrick(brick) {
-    selectedIndex = bricks.indexOf(brick);
-    updateBrickInformation(brick)
+function selectCube(cube) {
+    selectedIndex = cubes.indexOf(cube);
+    updatecubeInformation(cube)
 }
 
-function updateBrickInformation(brick) {
-    document.getElementById("scale_x").value = brick.transform.scale.x;
-    document.getElementById("scale_y").value = brick.transform.scale.y;
-    document.getElementById("scale_z").value = brick.transform.scale.z;
+function updatecubeInformation(cube) {
+    document.getElementById("scale_x").value = cube.transform.scale.x;
+    document.getElementById("scale_y").value = cube.transform.scale.y;
+    document.getElementById("scale_z").value = cube.transform.scale.z;
 
-    document.getElementById("position_x").value = brick.transform.position.x;
-    document.getElementById("position_y").value = brick.transform.position.y;
-    document.getElementById("position_z").value = brick.transform.position.z;
+    document.getElementById("position_x").value = cube.transform.position.x;
+    document.getElementById("position_y").value = cube.transform.position.y;
+    document.getElementById("position_z").value = cube.transform.position.z;
 
-    document.getElementById("rotation_x").value = brick.transform.rotation.x;
-    document.getElementById("rotation_y").value = brick.transform.rotation.y;
-    document.getElementById("rotation_z").value = brick.transform.rotation.z;
+    document.getElementById("rotation_x").value = cube.transform.rotation.x;
+    document.getElementById("rotation_y").value = cube.transform.rotation.y;
+    document.getElementById("rotation_z").value = cube.transform.rotation.z;
 
-    document.getElementById("color_r").value = brick.color.r;
-    document.getElementById("color_g").value = brick.color.g;
-    document.getElementById("color_b").value = brick.color.b;
-    document.getElementById("color_a").value = brick.color.a;
+    document.getElementById("color_r").value = cube.color.r;
+    document.getElementById("color_g").value = cube.color.g;
+    document.getElementById("color_b").value = cube.color.b;
+    document.getElementById("color_a").value = cube.color.a;
 }
 
 function setOnInput() {
     var scale_x = document.getElementById("scale_x");
     scale_x.oninput = function () {
-        bricks[selectedIndex].transform.scale.x = scale_x.value;
+        cubes[selectedIndex].transform.scale.x = scale_x.value;
     };
     var scale_y = document.getElementById("scale_y");
     scale_y.oninput = function () {
-        bricks[selectedIndex].transform.scale.y = scale_y.value;
+        cubes[selectedIndex].transform.scale.y = scale_y.value;
     };
     var scale_z = document.getElementById("scale_z");
     scale_z.oninput = function () {
-        bricks[selectedIndex].transform.scale.z = scale_z.value;
+        cubes[selectedIndex].transform.scale.z = scale_z.value;
     };
 
     var position_x = document.getElementById("position_x");
     position_x.oninput = function () {
-        bricks[selectedIndex].transform.position.x = position_x.value;
+        cubes[selectedIndex].transform.position.x = position_x.value;
     };
     var position_y = document.getElementById("position_y");
     position_y.oninput = function () {
-        bricks[selectedIndex].transform.position.y = position_y.value;
+        cubes[selectedIndex].transform.position.y = position_y.value;
     };
     var position_z = document.getElementById("position_z");
     position_z.oninput = function () {
-        bricks[selectedIndex].transform.position.z = position_z.value;
+        cubes[selectedIndex].transform.position.z = position_z.value;
     };
 
     var rotation_x = document.getElementById("rotation_x");
     rotation_x.oninput = function () {
-        bricks[selectedIndex].transform.rotation.x = rotation_x.value;
+        cubes[selectedIndex].transform.rotation.x = rotation_x.value;
     };
     var rotation_y = document.getElementById("rotation_y");
     rotation_y.oninput = function () {
-        bricks[selectedIndex].transform.rotation.y = rotation_y.value;
+        cubes[selectedIndex].transform.rotation.y = rotation_y.value;
     };
     var rotation_z = document.getElementById("rotation_z");
     rotation_z.oninput = function () {
-        bricks[selectedIndex].transform.rotation.z = rotation_z.value;
+        cubes[selectedIndex].transform.rotation.z = rotation_z.value;
     };
 
     var color_r = document.getElementById("color_r");
     color_r.oninput = function () {
-        bricks[selectedIndex].color.r = color_r.value;
+        cubes[selectedIndex].color.r = color_r.value;
     };
     var color_g = document.getElementById("color_g");
     color_g.oninput = function () {
-        bricks[selectedIndex].color.g = color_g.value;
+        cubes[selectedIndex].color.g = color_g.value;
     };
     var color_b = document.getElementById("color_b");
     color_b.oninput = function () {
-        bricks[selectedIndex].color.b = color_b.value;
+        cubes[selectedIndex].color.b = color_b.value;
     };
     var color_a = document.getElementById("color_a");
     color_a.oninput = function () {
-        bricks[selectedIndex].color.a = color_a.value;
+        cubes[selectedIndex].color.a = color_a.value;
     };
 
     var light_x = document.getElementById("light_x");
